@@ -1,7 +1,7 @@
 ## Application Details
 |               |
 | ------------- |
-|**Generation Date and Time**<br>Wed Nov 13 2024 10:18:11 GMT+0530 (India Standard Time)|
+|**Generation Date and Time**<br>Wed Nov 13 2024 15:43:06 GMT+0530 (India Standard Time)|
 |**App Generator**<br>@sap/generator-fiori-elements|
 |**App Generator Version**<br>1.15.4|
 |**Generation Platform**<br>Visual Studio Code|
@@ -9,14 +9,15 @@
 |**Service Type**<br>Local Cap|
 |**Service URL**<br>http://localhost:4004/odata/v4/salesorder/|
 |**Module Name**<br>salesorder|
-|**Application Title**<br>Sales Order |
+|**Application Title**<br>Sales Order|
 |**Namespace**<br>|
 |**UI5 Theme**<br>sap_horizon|
 |**UI5 Version**<br>1.130.0|
 |**Enable Code Assist Libraries**<br>False|
 |**Enable TypeScript**<br>False|
 |**Add Eslint configuration**<br>False|
-|**Main Entity**<br>A_SalesOrderItem|
+|**Main Entity**<br>SalesOrder|
+|**Navigation Entity**<br>to_Item|
 
 ## salesorder
 

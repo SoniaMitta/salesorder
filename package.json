@@ -20,7 +20,8 @@
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-salesorder": "cds watch --open salesorder/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-salesorder": "cds watch --open salesorder/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-salesorder1": "cds watch --open salesorder1/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "cds": {
     "requires": {
@@ -36,6 +37,15 @@
       "API_MATERIAL_STOCK_SRV": {
         "kind": "odata-v2",
         "model": "srv/external/API_MATERIAL_STOCK_SRV",
+        "credentials": {
+          "url": "https://my401292-api.s4hana.cloud.sap/sap/opu/odata/sap/API_MATERIAL_STOCK_SRV",
+          "username": "USER_NNRG",
+          "password": "FMesUvVB}JhYD9nVbDfRoVcdEffwmVNJJScMzuzx"
+        }
+      },
+      "API_MATERIAL_DOCUMENT_SRV_0001": {
+        "kind": "odata-v2",
+        "model": "srv/external/API_MATERIAL_DOCUMENT_SRV_0001",
         "credentials": {
           "url": "https://my401292-api.s4hana.cloud.sap/sap/opu/odata/sap/API_MATERIAL_STOCK_SRV",
           "username": "USER_NNRG",

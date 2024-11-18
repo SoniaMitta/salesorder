@@ -4,10 +4,46 @@ const { json2xml } = require('xml-js');
 
 module.exports = cds.service.impl(async function () {
     const {A_SalesOrderItem,A_MatlStkInAcctMod, Forms } = this.entities;
+    const salesorderapi = await cds.connect.to('API_SALES_ORDER_SRV');
+    const materialstockapi = await cds.connect.to('API_MATERIAL_STOCK_SRV');
+
+    this.on('READ', 'SalesOrder', async req => {
+        req.query.SELECT.columns = [
+            { ref: ['SalesOrder'] },
+            { ref: ['PurchaseOrderByCustomer'] },
+            { ref:['SoldToParty']},
+            { ref: ['to_Item'], expand: ['*'] }
+        ];
+
+        try {
+            // Fetching sales orders
+            let res = await salesorderapi.run(req.query);
+
+            // Check if res is an array, if not, wrap it in an array
+            if (!Array.isArray(res)) {
+                res = [res];
+            }
+
+            // Process each sales order item
+            res.forEach(element => {
+                if (element.to_Item) {
+                    const item = element.to_Item.find(item => item.SalesOrder === element.SalesOrder);
+                    if (item) {
+                        element.SalesOrderItem = item.SalesOrderItem;
+                        element.Material = item.Material;
+                    }
+                }
+            });
+
+            return res;
+        } catch (error) {
+            console.error('Error reading SalesOrder:', error);
+            return req.error(500, 'Failed to fetch data from SalesOrder service');
+        }
+    });
 
     this.on('READ', A_SalesOrderItem , async (req) => {
         try {
-            const salesorderapi = await cds.connect.to('API_SALES_ORDER_SRV');
             req.query.SELECT.columns = [{ ref: ['SalesOrder'] }, { ref: ['SalesOrderItem'] }, { ref: ['Material'] }, { ref: ['Batch'] }];
             const result = await salesorderapi.run(req.query);
             console.log('SalesOrderItem Data:', result);
@@ -20,7 +56,6 @@ module.exports = cds.service.impl(async function () {
 
     this.on('READ', A_MatlStkInAcctMod , async (req) => {
         try {
-            const materialstockapi = await cds.connect.to('API_MATERIAL_STOCK_SRV');
             req.query.SELECT.columns = [{ ref: ['Material'] }, { ref: ['Plant'] }, { ref: ['StorageLocation'] }, { ref: ['MatlWrhsStkQtyInMatlBaseUnit'] }];
             const result = await materialstockapi.run(req.query);
             console.log('Material stock Data:', result);
@@ -63,4 +98,57 @@ module.exports = cds.service.impl(async function () {
         }
 
     });
+
+    this.on('stockInfo', 'SalesOrder', async (req) => {
+        console.log(req.params);
+        const salesOrderId = req.params[0].SalesOrder;
+        const salesOrderResult = await salesorderapi.run(
+            SELECT.from('A_SalesOrderItem').columns(['SalesOrder', 'Material']).where({ SalesOrder: salesOrderId })
+        );
+        console.log('Sales Order Result:', salesOrderResult);
+    
+        if (!salesOrderResult || salesOrderResult.length === 0) {
+            return [];
+        }
+        const materials = [...new Set(salesOrderResult.map(item => item.Material))];
+        let materialDetails = [];
+        if (materials.length > 0) {
+            materialDetails = await materialstockapi.run(
+                SELECT.from('A_MatlStkInAcctMod')
+                    .columns(['Material', 'Plant', 'Batch', 'StorageLocation','MatlWrhsStkQtyInMatlBaseUnit','SDDocument','SDDocumentItem','MaterialBaseUnit'])
+                    .where({ Material: { in: materials } })
+            );
+        }
+        console.log('Material Details:', materialDetails);
+        return materialDetails;
+    });
+
+    this.on('stockAvailable', async (req) => {
+        console.log(req.params);
+        console.log(req);
+        /*const salesOrderId = req.params[0].SalesOrder;
+        const salesOrderResult = await salesorderapi.run(
+            SELECT.from('A_SalesOrderItem').columns(['SalesOrder', 'Material']).where({ SalesOrder: salesOrderId })
+        );
+        console.log('Sales Order Result:', salesOrderResult);
+    
+        if (!salesOrderResult || salesOrderResult.length === 0) {
+            return [];
+        }
+        const materials = [...new Set(salesOrderResult.map(item => item.Material))];
+        let materialDetails = [];
+        if (materials.length > 0) {
+            materialDetails = await materialstockapi.run(
+                SELECT.from('A_MatlStkInAcctMod')
+                    .columns(['Material', 'Plant', 'Batch', 'StorageLocation','MatlWrhsStkQtyInMatlBaseUnit'])
+                    .where({ Material: { in: materials } })
+            );
+        }
+        console.log('Material Details:', materialDetails);
+        return materialDetails;*/
+    });
+    
+
+
+
 });

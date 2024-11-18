@@ -13,7 +13,7 @@
     "sourceTemplate": {
       "id": "@sap/generator-fiori:lrop",
       "version": "1.15.4",
-      "toolsId": "7676596b-beeb-453c-a829-5313a164a5a3"
+      "toolsId": "4e6bbeac-c354-446c-9ebb-bfc3ff90b4b1"
     },
     "dataSources": {
       "mainService": {
@@ -85,29 +85,34 @@
       "routes": [
         {
           "pattern": ":?query:",
-          "name": "A_SalesOrderItemList",
-          "target": "A_SalesOrderItemList"
+          "name": "SalesOrderList",
+          "target": "SalesOrderList"
         },
         {
-          "pattern": "A_SalesOrderItem({key}):?query:",
+          "pattern": "SalesOrder({key}):?query:",
+          "name": "SalesOrderObjectPage",
+          "target": "SalesOrderObjectPage"
+        },
+        {
+          "pattern": "SalesOrder({key})/to_Item({key2}):?query:",
           "name": "A_SalesOrderItemObjectPage",
           "target": "A_SalesOrderItemObjectPage"
         }
       ],
       "targets": {
-        "A_SalesOrderItemList": {
+        "SalesOrderList": {
           "type": "Component",
-          "id": "A_SalesOrderItemList",
+          "id": "SalesOrderList",
           "name": "sap.fe.templates.ListReport",
           "options": {
             "settings": {
-              "initialLoad" : "Enabled",
-              "contextPath": "/A_SalesOrderItem",
+              "initialLoad":"Enabled",
+              "contextPath": "/SalesOrder",
               "variantManagement": "Page",
               "navigation": {
-                "A_SalesOrderItem": {
+                "SalesOrder": {
                   "detail": {
-                    "route": "A_SalesOrderItemObjectPage"
+                    "route": "SalesOrderObjectPage"
                   }
                 }
               },
@@ -117,13 +122,32 @@
                     "type": "ResponsiveTable"
                   },
                   "actions": {
-                    "fetch": {
-                      "press": "salesorder.ext.fetch.fetch.fetch",
+                    "stockInfo": {
+                      "press": "salesorder.ext.stockInfo.stockInfo.stockInfo",
                       "visible": true,
                       "enabled": true,
                       "requiresSelection": false,
-                      "text": "Check Material Stock"
+                      "text": "stockInfo"
                     }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "SalesOrderObjectPage": {
+          "type": "Component",
+          "id": "SalesOrderObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "initialLoad":"Enabled",
+              "editableHeaderContent": false,
+              "contextPath": "/SalesOrder",
+              "navigation": {
+                "to_Item": {
+                  "detail": {
+                    "route": "A_SalesOrderItemObjectPage"
                   }
                 }
               }
@@ -136,9 +160,8 @@
           "name": "sap.fe.templates.ObjectPage",
           "options": {
             "settings": {
-              "initialLoad" : "Enabled",
               "editableHeaderContent": false,
-              "contextPath": "/A_SalesOrderItem"
+              "contextPath": "/SalesOrder/to_Item"
             }
           }
         }
